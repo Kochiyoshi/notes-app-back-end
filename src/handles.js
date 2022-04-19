@@ -10,8 +10,30 @@ const checkId = (notes) => {
   return id;
 };
 
+class ValidationError extends Error {
+  constructor(message) {
+    super(message);
+    this.name = 'ValidationError';
+  }
+}
+
+const validationInput = (a, b, c) => {
+  if (a === undefined || b === undefined || c === undefined) {
+    throw new ValidationError('Input tidak boleh kosong (Undefined)');
+  }
+};
+
 const addNoteHandler = (request, h) => {
   const { title, tags, body } = request.payload;
+
+  try {
+    validationInput(title, tags, body);
+  } catch (error) {
+    return h.response({
+      status: 'fail',
+      message: error.message,
+    }).code(500);
+  }
 
   const id = checkId(notes);
   const now = new Date().toISOString();
